@@ -10,55 +10,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model Users {
-  id Int @id @default(autoincrement())
-  full_name String @db.VarChar(100)
-  email String @unique
-  phone_no Int? @unique
-  password String @db.VarChar(100)
-  categoty userCategory @default(SME)
-  avatar String? 
-  cac_url String?
-  cac_no Int? 
-  Role UserRole?
-  isActive Boolean @default(false)
+model User {
+  id        Int        @id @default(autoincrement())
+  fullname  String     @db.VarChar(100)
+  email     String     @unique
+  phone     Int?       @unique
+  password  String     @db.VarChar(60)
+  avatar    String?
+  isActive  Boolean    @default(false)
+  deleted   Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  UserRole  UserRole[]
 }
 
 model Role {
-  id          Int           @id @default(autoincrement())
-  name        String        @unique
-  description String
-  userRole UserRole[]
-  permissionRole PermissionRole?
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  description    String
+  deleted        Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  UserRole       UserRole[]
+  RolePermission RolePermission[]
 }
-model UserRole {
-  id Int @id @default(autoincrement())
-  role Role @relation(fields: [roleId], references: [id])
-  roleId Int @unique
 
-  user Users @relation(fields: [userId], references: [id])
-  userId Int @unique
+model UserRole {
+  id        Int      @id @default(autoincrement())
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Permission {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  description String
-  permissionRole PermissionRole?
+  id             Int             @id @default(autoincrement())
+  name           String          @unique
+  description    String
+  deleted        Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  RolePermission RolePermission?
 }
 
-model PermissionRole {
-  id Int @id @default(autoincrement())
-  
-  permission Permission @relation(fields: [permissionId],references: [id])
-  permissionId Int @unique
-
-  role Role @relation(fields: [roleId], references: [id])
-  roleId Int @unique
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int        @unique
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       Int
+  deleted      Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
-enum userCategory{
+enum userCategory {
   INTERNATIONAL
   NATIONAL
   REGIONAL
