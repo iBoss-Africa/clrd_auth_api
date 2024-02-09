@@ -3,6 +3,8 @@
 
 generator client {
   provider = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["fullTextIndex", "fullTextSearch"]
 }
 
 datasource db {
@@ -13,24 +15,38 @@ datasource db {
 
 model Users {
   id Int @id @default(autoincrement())
-  full_name String @db.VarChar(100)
+  first_name String @db.VarChar(100)
+  last_name String @db.VarChar(100)
   email String @unique
   phone_no Int? @unique
   password String @db.VarChar(100)
-  categoty userCategory @default(SME)
   avatar String? 
-  cac_url String?
-  cac_no Int? 
-  Role UserRole?
+  categoty userCategory @default(SME)
+  company Company[]
+  role UserRole?
   isActive Boolean @default(false)
 }
+model Company {
+  id Int @id @default(autoincrement())
+  company_name String @db.VarChar(100)
+  country String? @db.VarChar(45)
+  state String? @db.VarChar(45)
+  city String? @db.VarChar(45)
+  street_address String? @db.VarChar(255)
+  postal_code String?
+  cac_url String?
+  cac_no Int? 
+  user Users @relation(fields: [userId], references: [id])
+  userId Int 
+}
+
 
 model Role {
   id          Int           @id @default(autoincrement())
   name        String        @unique
   description String
   userRole UserRole[]
-  permissionRole PermissionRole?
+  permissionRole PermissionRole[]
 }
 model UserRole {
   id Int @id @default(autoincrement())
@@ -50,13 +66,15 @@ model Permission {
 
 model PermissionRole {
   id Int @id @default(autoincrement())
-  
+
   permission Permission @relation(fields: [permissionId],references: [id])
   permissionId Int @unique
 
   role Role @relation(fields: [roleId], references: [id])
   roleId Int @unique
 }
+
+
 
 enum userCategory{
   INTERNATIONAL
