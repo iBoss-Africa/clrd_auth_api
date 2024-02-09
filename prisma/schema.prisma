@@ -3,6 +3,8 @@
 
 generator client {
   provider = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["fullTextIndex", "fullTextSearch"]
 }
 
 datasource db {
@@ -12,9 +14,10 @@ datasource db {
 
 model User {
   id        Int        @id @default(autoincrement())
-  fullname  String     @db.VarChar(100)
+  firstName  String     @db.VarChar(30)
+  lastName  String      @db.VarChar(30)
   email     String     @unique
-  phone     Int?       @unique
+  phone     Int?       
   password  String     @db.VarChar(60)
   avatar    String?
   isActive  Boolean    @default(false)
@@ -23,6 +26,19 @@ model User {
   updatedAt DateTime   @updatedAt
   UserRole  UserRole[]
 }
+
+model Company {
+  id Int @id @default(autoincrement())
+  companyName String @db.VarChar(100)
+  country String? @db.VarChar(45)
+  state String? @db.VarChar(40)
+  city String? @db.VarChar(45)
+  streetAddress String? @db.VarChar(150)
+  postalCode String?
+  cacUrl String?
+  cacNo String? 
+}
+
 
 model Role {
   id             Int              @id @default(autoincrement())
