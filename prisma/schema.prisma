@@ -17,14 +17,15 @@ model User {
   firstName  String     @db.VarChar(30)
   lastName  String      @db.VarChar(30)
   email     String     @unique
-  phone     Int?       
+  phone     String     @db.VarChar(11)
   password  String     @db.VarChar(60)
   avatar    String?
   isActive  Boolean    @default(false)
   deleted   Boolean    @default(false)
   createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  UserRole  UserRole[]
+  updatedAt DateTime   @updatedAt()
+  role     Role ? @relation(fields: [role_id], references: [id])
+  role_id Int?  @db.Integer()
 }
 
 model Company {
@@ -36,51 +37,34 @@ model Company {
   streetAddress String? @db.VarChar(150)
   postalCode String?
   cacUrl String?
-  cacNo String? 
+  cacNo String?
 }
 
 
 model Role {
   id             Int              @id @default(autoincrement())
   name           String           @unique
-  description    String
   deleted        Boolean          @default(false)
   createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  UserRole       UserRole[]
-  RolePermission RolePermission[]
-}
+  updatedAt      DateTime         @updatedAt()
 
-model UserRole {
-  id        Int      @id @default(autoincrement())
-  role      Role     @relation(fields: [roleId], references: [id])
-  roleId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  deleted   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  permission Permission[]
+  user User[]
 }
 
 model Permission {
-  id             Int             @id @default(autoincrement())
-  name           String          @unique
-  description    String
-  deleted        Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  RolePermission RolePermission?
-}
+  id         Int             @id @default(autoincrement())
+  role       Role @relation(fields: [role_id], references: [id])
+  role_id    Int     @db.Integer()
+  action     String  @db.VarChar()
+  subject    String  @db.VarChar()
+  inverted   Boolean @default(false)
+  conditions Json?   @db.JsonB()
+  reason     String? @db.Text()
 
-model RolePermission {
-  id           Int        @id @default(autoincrement())
-  permission   Permission @relation(fields: [permissionId], references: [id])
-  permissionId Int        @unique
-  role         Role       @relation(fields: [roleId], references: [id])
-  roleId       Int
-  deleted      Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  deleted    Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt()
 }
 
 enum userCategory {
