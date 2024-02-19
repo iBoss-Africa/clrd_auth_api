@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
+import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports:[
@@ -18,18 +20,18 @@ import { PassportModule } from '@nestjs/passport';
     useFactory: (config: ConfigService) => {
       return {
         // Do not use process.env here, it will read undefined.
-        secret: config.get<string>('JWT_SECRET'),
+        secret: config.get<string>('jwt_secret'),
         signOptions: {
-          expiresIn: config.get<string>('JWT_EXPIRES'),
+          expiresIn: config.get<string>('jwt_expires'),
         },
       };
     }
   }),
-  UsersModule],
+  UsersModule,
+  ],
   controllers: [AuthController],
-
-  providers: [AuthService, PrismaService],
-  exports: [AuthService]
+  providers: [CaslAbilityFactory,AuthService, PrismaService,JwtStrategy,],
+  exports: [AuthService,JwtStrategy]
 
 })
 export class AuthModule {}

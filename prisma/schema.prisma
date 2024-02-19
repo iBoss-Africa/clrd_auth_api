@@ -26,18 +26,24 @@ model User {
   updatedAt DateTime   @updatedAt()
   role     Role ? @relation(fields: [role_id], references: [id])
   role_id Int?  @db.Integer()
+
+  company   Company[]
+
 }
 
 model Company {
   id Int @id @default(autoincrement())
   companyName String @db.VarChar(100)
-  country String? @db.VarChar(45)
+  category companyCategory @default(SME)  
+  country String? @db.VarChar(7)
   state String? @db.VarChar(40)
   city String? @db.VarChar(45)
   streetAddress String? @db.VarChar(150)
   postalCode String?
   cacUrl String?
   cacNo String?
+  user     User ? @relation(fields: [user_id], references: [id])
+  user_id Int?  @db.Integer()
 }
 
 
@@ -67,7 +73,7 @@ model Permission {
   updatedAt  DateTime        @updatedAt()
 }
 
-enum userCategory {
+enum companyCategory {
   INTERNATIONAL
   NATIONAL
   REGIONAL

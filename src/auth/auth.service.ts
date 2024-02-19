@@ -3,10 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import { SignUpDto } from './dto/signup.dto';
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
 import APIFeatures from 'src/utils/apiFeatures.utils';
 import { LoginDto } from './dto/login.dto';
-import { Console } from 'console';
+import { ConfigService } from '@nestjs/config';
 
 
 @Injectable()
@@ -17,13 +17,12 @@ export class AuthService {
         private jwtService: JwtService
     ){}
 
-    async Signup(signUpDto: SignUpDto): Promise<{token: string}>{
+    async Signup(signUpDto: SignUpDto): Promise<{}>{
         // Extract the fields from the signuDto
         const {firstName, lastName, email, phone, password} = signUpDto;
 
         // check if the email already exist
-        const isExist = await this.userService.getOne(email);
-        console.log(isExist)
+        const isExist = await this.userService.getOne({email});
 
         if(isExist) throw new ConflictException('Email already exist!')
 
@@ -44,32 +43,29 @@ export class AuthService {
         // Generate token
         const token = await APIFeatures.assignJwtToken(newUser, this.jwtService);
 
-        return {token};
+        return {token, data: newUser};
     }
 
     async login(loginDto: LoginDto){
         const {email, password} = loginDto;
-        
+
         // check if the email already exist
-        const isExist = await this.userService.getOne(email);
+        const isExist = await this.userService.getOne({email});
 
         if(!isExist){
-            throw new NotFoundException('Invali email or password')
+            throw new NotFoundException('Invalid email or password')
         }
 
         // check if password is correct or not
         const isPasswordMatch =  await bcrypt.compare(password, isExist.password);
         
         if (!isPasswordMatch) {
-            throw new UnauthorizedException('Invali email or password');
+            throw new UnauthorizedException('Invalid email or password');
         }
 
         // Generate token
         const token = await APIFeatures.assignJwtToken(isExist, this.jwtService);
 
         return { token, data: isExist }
-        
-
     }
-
 }

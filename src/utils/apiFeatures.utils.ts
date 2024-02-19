@@ -11,11 +11,8 @@ export default class APIFeatures{
     ): Promise<string>{
 
         const payload = { 
-            id: user.id, 
-            email: user.email, 
-            firstName: user.firstName, 
-            lastName:user.lastName,
-            phone: user.phone
+            id: user.id,
+            email: user.email
         };
         const token = await jwtService.sign(payload);
 

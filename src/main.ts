@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-
+import * as dotenv from 'dotenv'
 async function bootstrap() {
+  dotenv.config()
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('v1/api/');
@@ -11,8 +12,8 @@ async function bootstrap() {
   
 
   const config = new DocumentBuilder()
-      .setTitle('My API')
-      .setDescription('Website APIs documentation')
+      .setTitle('CLRD API')
+      .setDescription('CLRD APIs documentation')
       .setVersion('1.0')
       .addTag('API')
       .build();
