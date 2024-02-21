@@ -4,7 +4,7 @@ import { IsEmail, IsInt, IsNotEmpty, IsString, Length } from "class-validator";
 
 
 
-export class SignUpDto {
+export class UserSignUpDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
@@ -28,7 +28,7 @@ export class SignUpDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    @Length(8,12)
+    @Length(8)
     readonly password: string 
 
 }

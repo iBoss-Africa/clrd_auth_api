@@ -11,11 +11,6 @@ const prisma = new PrismaClient();
 @Injectable()
 export class CaslAbilityFactory {
   async createForUser(userPayload: User) {
-    // if (!userPayload || !userPayload.id) {
-    //   throw new NotFoundException('User not found!');
-    // }
-
-    // const id = userPayload.id;
     
      // Fetch the user's role from the database
      const userWithRole = await prisma.user.findUnique({
@@ -23,15 +18,13 @@ export class CaslAbilityFactory {
         include: { role: true},
     });
 
-    // Fetch the the permission from the database
-    //  const roleWithPermission = await prisma.role.findUnique({
-    //     where: { id: userPayload.role_id },
-    //     include: { permission: true},
-    // });
-
     if (!userWithRole.role) {
       throw new UnauthorizedException('you dont have the neccessary permission to perform this operation yet.');
     }
+
+    // if(id !== userPayload.id){
+    //           throw new NotFoundException('Not found!')
+    //     }
 
     const { can, cannot, build } = new AbilityBuilder(createPrismaAbility);
 
@@ -45,7 +38,7 @@ export class CaslAbilityFactory {
       // Example: Regular users can only read their own profile
       can(Actions.Read, Subjects.User, { id: userPayload.id });
     }
-
+    
     return build();
   }
 }

@@ -12,7 +12,8 @@ export class Authguard implements CanActivate {
     private caslAbilityFactory: CaslAbilityFactory) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const user = context.switchToHttp().getRequest().user;
+    const request = context.switchToHttp().getRequest()
+    const user = request.user;
     const ability = await this.caslAbilityFactory.createForUser(user);
 
     const requiredAction = this.reflector.get<Actions>('action', context.getHandler());

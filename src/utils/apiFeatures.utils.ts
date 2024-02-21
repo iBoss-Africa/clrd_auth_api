@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { Company, User } from '@prisma/client';
 
 
 
