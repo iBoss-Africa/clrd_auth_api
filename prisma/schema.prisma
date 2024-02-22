@@ -25,8 +25,8 @@ model User {
   city String? @db.VarChar(45)
   streetAddress String? @db.VarChar(150)
   postalCode String?
-  driverLicense String?
-  driverlicenseNo String?
+  driverLicenseUrl String?
+  driverLicenseNo String?
   isActive  Boolean    @default(false)
   deleted   Boolean    @default(false)
   createdAt DateTime   @default(now())

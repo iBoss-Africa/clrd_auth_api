@@ -6,13 +6,14 @@ import { Actions } from '../../casl/actions.enum';
 import { Subjects } from '../../casl/subjects.enum';
 
 @Injectable()
-export class Authguard implements CanActivate {
+export class CanActAuthguard implements CanActivate {
   constructor(
     private reflector: Reflector, 
     private caslAbilityFactory: CaslAbilityFactory) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
+    console.log(request);
     const user = request.user;
     const ability = await this.caslAbilityFactory.createForUser(user);
 

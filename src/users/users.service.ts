@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { UpdateuserDto } from './dto/updateUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -25,62 +25,88 @@ export class UsersService {
         }
         
     }
-    
-    // async updateUser(id: number, updateUserDto:UpdateuserDto, user:User){
-    //     const  {firstName, lastName, phone} = updateUserDto;
 
-    //     if(id !== user.id){
-    //         throw new NotFoundException('User not found!')
-    //     }
+    // fetch all users
+    async getAll(){
+        try{
+            // get all users from the database
+            const users = await this.prisma.user.findMany({where: {deleted: false}});
 
-    //     const updateUser = await this.prisma.user.update({
-    //         where:{id: user.id},
-    //         data: {firstName, lastName, phone}
-    //     })
-    //     return updateUser;
-    // }
-
-    // async updateCompany(userId: number, updateCompanyDto: UpdateCompanyDto, user:User){
+            return users;
+        }catch(error){
+            if(error instanceof Error){
+                throw new BadRequestException( 'Bad request', error.message)
+            }
+        }
         
-    //     try{
-    //         const {
-    //             companyName,
-    //             email,
-    //             phone,
-    //             country,
-    //             state,
-    //             city,
-    //             streetAddress,
-    //             postalCode,
-    //             cacUrl,
-    //             cacNo,
-    //         } = updateCompanyDto;
+    }
 
-    //         if(user.id !== userId){
-    //             throw new UnauthorizedException('you can perform this operation!');
-    //         }else{
-    //             const newcompany = await this.prisma.company.create({
-    //                 data:{
-    //                     companyName,
-    //                     email,
-    //                     phone,
-    //                     country,
-    //                     state,
-    //                     city,
-    //                     streetAddress,
-    //                     postalCode,
-    //                     cacUrl,
-    //                     cacNo,
-    //                     }
-    //                 })
+    // View Trash
+    async viewTrash(){
+        try{
+            // get all users from the database
+            const users = await this.prisma.user.findMany({where: {deleted: true}});
 
-    //             return newcompany
-    //         }
-    //     }catch(error){
-    //         if(error instanceof Error){
-    //             throw new BadRequestException('Bad request', error.message)
-    //         }
-    //     }
-    // }
+            return users;
+        }catch(error){
+            if(error instanceof Error){
+                throw new BadRequestException( 'Bad request', error.message)
+            }
+        }
+        
+    }
+
+    // Update user
+    async updateUser(id: number, updateUserDto:UpdateUserDto, user:User){
+        console.log(updateUserDto)
+        try{
+            const  {
+                firstName, 
+                lastName, 
+                avatar, 
+                country,
+                driverLicenseNo,
+                state,
+                city,
+                streetAddress,
+                postalCode,
+                driverLicenseUrl,
+             } = updateUserDto;
     
+            if(id !== user.id){
+                throw new NotFoundException('User not found!')
+            }
+    
+            const updateUser = await this.prisma.user.update({
+                where:{id: user.id},
+                data: {
+                    firstName, 
+                    lastName, 
+                    avatar, 
+                    country,
+                    driverLicenseNo,
+                    state,
+                    city,
+                    streetAddress,
+                    driverLicenseUrl,
+                    postalCode,
+                }
+            })
+            return updateUser;
+        }catch(error){
+            if(error instanceof Error){
+                throw new BadRequestException( 'Bad request', error.message)
+            }
+        }
+    }
+
+    // Delete User
+    async softDelet(id: number){
+        const user = this.getOne({id}); 
+
+        return await this.prisma.user.update({
+            where: {id: id},
+            data: {deleted: true}
+        })
+    }
 }

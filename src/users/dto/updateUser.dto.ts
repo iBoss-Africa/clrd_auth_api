@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, Length } from "class-validator";
 
 
 
-export class UpdateuserDto {
+export class UpdateUserDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
@@ -18,12 +18,12 @@ export class UpdateuserDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    readonly phone: string;
+    readonly avatar: string;
 
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    readonly driverLicense: string;
+    readonly driverLicenseUrl: string;
 
     @ApiProperty()
     @IsNotEmpty()

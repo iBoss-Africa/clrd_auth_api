@@ -7,10 +7,9 @@ import  {Actions} from '../casl/actions.enum';
 import { SetMetadata } from '@nestjs/common';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User, Company} from '@prisma/client';
-import { UpdateuserDto } from 'src/users/dto/updateUser.dto';
 import { UsersService } from 'src/users/users.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Authguard } from './guard/auth.guard';
+import { CanActAuthguard } from './guard/canact.auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -34,17 +33,4 @@ export class AuthController {
     ): Promise<{ token:string}> {
         return  this.authService.login(loginDto);
     }
-
-    // Update user
-    // @Patch('/:id')
-    // @SetMetadata('action', Actions.Create)
-    // @UseGuards(AuthGuard(),Authguard)
-    // async updateUser(
-    //     @Body()
-    //     @Param('id')id: string,
-    //     updateUserDto: UpdateuserDto,
-    //     @CurrentUser() user: User
-    // ){
-    //     return this.usersService.updateUser(parseInt(id), updateUserDto, user)
-    // }
 }
