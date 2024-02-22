@@ -9,19 +9,15 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService){}
+    constructor(private readonly usersService: UsersService) { }
 
-
-   
-    
-    
     // All Users
     @Get()
     @UseGuards(AuthGuard())
     // @SetMetadata('action', Actions.Read)
     // @UseGuards(AuthGuard(),CanActAuthguard)
-    async getAll(){
-        return this.usersService.getAll();
+    async getAll() {
+        return this.usersService.getAll({});
     }
 
 
@@ -30,10 +26,9 @@ export class UsersController {
     // @SetMetadata('action', Actions.Read)
     // @UseGuards(AuthGuard(),CanActAuthguard)
     async getOne(
-        @Param('id')id: string
-    ): Promise<User>{
-        // Convert the id to a number if necessary,
-        const numericId = parseInt(id,  10);
+        @Param('id') id: string
+    ): Promise<User> {
+        const numericId = parseInt(id, 10);
         // Pass the id as part of an object that matches the UserWhereUniqueInput type
         return this.usersService.getOne({ id: numericId });
     }
@@ -43,21 +38,21 @@ export class UsersController {
     @UseGuards(AuthGuard())
     // @SetMetadata('action', Actions.Read)
     // @UseGuards(AuthGuard(),CanActAuthguard)
-    async getTrash(){
+    async getTrash() {
         return this.usersService.viewTrash();
     }
 
 
-   // Update user
+    // Update user
     @Patch('/:id')
     // @SetMetadata('action', Actions.Create)
     @UseGuards(AuthGuard())
     async updateUser(
         @Body()
         updateUserDto: UpdateUserDto,
-        @Param('id')id: string,
+        @Param('id') id: string,
         @CurrentUser() user: User
-    ){
+    ) {
         return this.usersService.updateUser(parseInt(id), updateUserDto, user)
     }
 
@@ -66,8 +61,8 @@ export class UsersController {
     // @SetMetadata('action', Actions.Create)
     @UseGuards(AuthGuard())
     async trash(
-        @Param('id')id: string,
-    ){
+        @Param('id') id: string,
+    ) {
         return this.usersService.softDelet(parseInt(id))
     }
 }

@@ -9,17 +9,17 @@ async function bootstrap() {
 
   app.setGlobalPrefix('v1/api/');
   app.useGlobalPipes(new ValidationPipe());
-  
+
 
   const config = new DocumentBuilder()
-      .setTitle('CLRD API')
-      .setDescription('CLRD APIs documentation')
-      .setVersion('1.0')
-      .addTag('API')
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('v1/api', app, document);
- 
+    .setTitle('CLRD API')
+    .setDescription('CLRD APIs documentation')
+    .setVersion('1.0')
+    .addTag('API')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('v1/api', app, document);
+
   await app.listen(3000);
 }
 bootstrap();
