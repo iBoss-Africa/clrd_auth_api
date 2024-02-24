@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class PermissionsService {
-  create(createPermissionDto: CreatePermissionDto) {
-    return 'This action adds a new permission';
-  }
+    constructor(private prisma: PrismaService) { }
 
-  findAll() {
-    return `This action returns all permissions`;
-  }
+    async create(createPermissionDto: CreatePermissionDto) {
+        return this.prisma.permission.create({ data: createPermissionDto });
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} permission`;
-  }
+    async findAll() {
+        return this.prisma.permission.findMany();
+    }
 
-  update(id: number, updatePermissionDto: UpdatePermissionDto) {
-    return `This action updates a #${id} permission`;
-  }
+    async findOne(id: number) {
+        return this.prisma.permission.findUnique({ where: { id } });
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} permission`;
-  }
+    async update(id: number, updatePermissionDto: UpdatePermissionDto) {
+        return this.prisma.permission.update({
+            where: { id },
+            data: updatePermissionDto
+        });
+    }
+
+    async remove(id: number) {
+        const permission = await this.prisma.permission.findUnique({ where: { id } });
+        if (!permission) throw new HttpException('Permisson not found', HttpStatus.NOT_FOUND);
+        return this.prisma.permission.delete({ where: { id } });
+    }
 }

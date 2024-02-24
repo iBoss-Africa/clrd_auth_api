@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString, Length } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 
 
@@ -8,12 +7,12 @@ export class UpdateUserDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-   readonly firstName: string
+    readonly firstName: string
 
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-   readonly lastName: string
+    readonly lastName: string
 
     @ApiProperty()
     @IsNotEmpty()

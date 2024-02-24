@@ -16,7 +16,7 @@ export class RolesService {
     }
 
     async findOne(id: number) {
-        return `This action returns a #${id} role`;
+        return this.prisma.role.findUnique({ where: { id } });
     }
 
     async update(id: number, role: RoleDto) {
