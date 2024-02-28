@@ -7,12 +7,10 @@ import { Actions } from 'src/casl/actions.enum';
 import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { Subjects } from 'src/casl/subjects.enum';
-// import { PassportModule } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
-
     // All Users
     @Get()
     @UseGuards(AuthGuard())
