@@ -6,6 +6,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Actions } from 'src/casl/actions.enum';
 import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { Subjects } from 'src/casl/subjects.enum';
+// import { PassportModule } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -14,8 +16,9 @@ export class UsersController {
     // All Users
     @Get()
     @UseGuards(AuthGuard())
-    // @SetMetadata('action', Actions.Read)
-    // @UseGuards(AuthGuard(),CanActAuthguard)
+    @SetMetadata('action', Actions.Read)
+    @SetMetadata('subject', Subjects.User)
+    @UseGuards(AuthGuard(), CanActAuthguard)
     async getAll() {
         return this.usersService.getAll({});
     }

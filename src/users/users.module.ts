@@ -4,11 +4,12 @@ import { PrismaService } from 'src/prisma.service';
 import { UsersController } from './users.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [forwardRef(() => AuthModule)],
-  providers: [CaslAbilityFactory,UsersService,PrismaService],
+  providers: [CaslAbilityFactory, UsersService, PrismaService, PassportModule],
   exports: [UsersService],
   controllers: [UsersController],
 })
-export class UsersModule {}
+export class UsersModule { }

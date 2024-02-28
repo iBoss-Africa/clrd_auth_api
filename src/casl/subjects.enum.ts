@@ -1,7 +1,7 @@
-// subjects.enum.ts
 export enum Subjects {
+    All = 'all',
     User = 'User',
-    Company = 'Company'
+    Company = 'Company',
+    Role = 'Role',
     // Add other subjects if needed
-  }
-  
+}

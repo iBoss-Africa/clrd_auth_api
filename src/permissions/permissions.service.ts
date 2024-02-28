@@ -31,4 +31,8 @@ export class PermissionsService {
         if (!permission) throw new HttpException('Permisson not found', HttpStatus.NOT_FOUND);
         return this.prisma.permission.delete({ where: { id } });
     }
+
+    async getRolePermissions(roleId: number) {
+        const permissions = await this.prisma.permission.findMany({ where: { roleId } });
+    }
 }

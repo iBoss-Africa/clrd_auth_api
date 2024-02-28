@@ -1,33 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, SetMetadata } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RoleDto } from './dto/role.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Actions } from 'src/casl/actions.enum';
+import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
+import { Subjects } from 'src/casl/subjects.enum';
 
 @Controller('roles')
+@SetMetadata('subject', Subjects.Role)
+@UseGuards(AuthGuard(), CanActAuthguard)
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) { }
+    constructor(private readonly rolesService: RolesService) { }
 
-  @Post()
-  create(@Body() createRoleDto: RoleDto) {
-    return this.rolesService.create(createRoleDto);
-  }
+    @Post()
+    @SetMetadata('action', Actions.Create)
+    create(@Body() createRoleDto: RoleDto) {
+        return this.rolesService.create(createRoleDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.rolesService.findAll();
-  }
+    @Get()
+    @SetMetadata('action', Actions.Read)
+    findAll() {
+        return this.rolesService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(+id);
-  }
+    @Get(':id')
+    @SetMetadata('action', Actions.Read)
+    findOne(@Param('id') id: string) {
+        return this.rolesService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: RoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
-  }
+    @Patch(':id')
+    @SetMetadata('action', Actions.Update)
+    update(@Param('id') id: string, @Body() updateRoleDto: RoleDto) {
+        return this.rolesService.update(+id, updateRoleDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
-  }
+    @Delete(':id')
+    @SetMetadata('action', Actions.Delete)
+    remove(@Param('id') id: string) {
+        return this.rolesService.remove(+id);
+    }
 }

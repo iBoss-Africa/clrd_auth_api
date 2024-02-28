@@ -2,10 +2,15 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { RoleDto } from './dto/role.dto';
 import { PrismaService } from 'src/prisma.service';
 import { UsersService } from 'src/users/users.service';
+import { PermissionsService } from 'src/permissions/permissions.service';
 
 @Injectable()
 export class RolesService {
-    constructor(private prisma: PrismaService, private userService: UsersService) { }
+    constructor(
+        private prisma: PrismaService,
+        private userService: UsersService,
+        private permissionService: PermissionsService
+    ) { }
 
     async create(roleDto: RoleDto) {
         return this.prisma.role.create({ data: roleDto });
@@ -35,4 +40,7 @@ export class RolesService {
         if (user) throw new HttpException('You can\'t delete this role because one or more users have it', HttpStatus.NOT_ACCEPTABLE);
         return this.prisma.role.delete({ where: { id } });
     }
+
+    // async fetchRolePermissions(roleId: number) {
+
 }
