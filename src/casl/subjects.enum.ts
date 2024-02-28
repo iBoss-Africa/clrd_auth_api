@@ -3,5 +3,6 @@ export enum Subjects {
     User = 'User',
     Company = 'Company',
     Role = 'Role',
+    Permission = 'Permission'
     // Add other subjects if needed
 }

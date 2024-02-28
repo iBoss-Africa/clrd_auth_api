@@ -11,8 +11,8 @@ export class PermissionsService {
         return this.prisma.permission.create({ data: createPermissionDto });
     }
 
-    async findAll() {
-        return this.prisma.permission.findMany();
+    async findAll(criteria: Object) {
+        return this.prisma.permission.findMany({ where: criteria });
     }
 
     async findOne(id: number) {
@@ -33,6 +33,6 @@ export class PermissionsService {
     }
 
     async getRolePermissions(roleId: number) {
-        const permissions = await this.prisma.permission.findMany({ where: { roleId } });
+        return this.findAll({ roleId });
     }
 }
