@@ -1,7 +1,7 @@
 // subjects.enum.ts
 export enum Subjects {
     User = 'User',
-    Company = 'Company'
+    Company = 'Company',
     // Add other subjects if needed
   }
   

@@ -3,9 +3,12 @@ import { CompanyController } from './company.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { PrismaService } from 'src/prisma.service';
 import { CompanyService } from './company.service';
+import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { UsersService } from 'src/users/users.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [forwardRef(() => AuthModule)],
+  imports: [forwardRef(() => AuthModule), forwardRef(() => UsersModule)],
   providers: [CompanyService, PrismaService],
   controllers: [CompanyController],
   exports: [CompanyService]

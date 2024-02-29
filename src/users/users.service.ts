@@ -1,12 +1,17 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
+import * as bcrypt from 'bcryptjs';
+import APIFeatures from 'src/utils/apiFeatures.utils';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
     constructor(
-        private prisma: PrismaService
+        private prisma: PrismaService,
+        private jwtService: JwtService,
     ){}
 
     // get a single user
@@ -17,7 +22,7 @@ export class UsersService {
                 where: {...criteria, deleted: false}
             });
 
-            return user;
+            return  user;
         }catch(error){
             if(error instanceof Error){
                 throw new BadRequestException('Bad request', error.message)
@@ -29,9 +34,7 @@ export class UsersService {
     // fetch all users
     async getAll(){
         try{
-            // get all users from the database
             const users = await this.prisma.user.findMany({where: {deleted: false}});
-
             return users;
         }catch(error){
             if(error instanceof Error){
@@ -41,10 +44,42 @@ export class UsersService {
         
     }
 
+     // Signup users
+     async Signup(userSignUpDto:UserSignUpDto): Promise<{}>{
+
+        try{
+
+            // Extract the fields from the signuDto
+            const {firstName, lastName, email, phone, password} = userSignUpDto;
+            // check if the email already exist
+            const user = await this.getOne({email});
+            if(user) throw new ConflictException('Email already exist!');
+
+            // hash password
+            const hashPassword = await bcrypt.hash(password, 10);
+
+            // Creating the new user
+            const newUser = await this.prisma.user.create({
+                data: {
+                    firstName, 
+                    lastName, 
+                    email, 
+                    phone, 
+                    password: hashPassword
+                }
+            });
+            return {data: newUser};
+        }catch(error){
+            if(error instanceof Error){
+                console.log(error.stack)
+                throw new BadRequestException('Bad request', error.message);
+            }
+        }
+    }
+
     // View Trash
     async viewTrash(){
         try{
-            // get all users from the database
             const users = await this.prisma.user.findMany({where: {deleted: true}});
 
             return users;

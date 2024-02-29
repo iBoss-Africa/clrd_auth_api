@@ -30,7 +30,7 @@ export class CaslAbilityFactory {
 
     // Define abilities based on user role or other criteria
     // Example: Admin can manage all users
-    if (userWithRole.role.name === 'admin') {
+    if (userWithRole.role.name === 'admin'){
       can(Actions.Manage, Subjects.User);
     } else {
       

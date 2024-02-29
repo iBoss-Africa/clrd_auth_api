@@ -12,7 +12,7 @@ export class CanActAuthguard implements CanActivate {
     private caslAbilityFactory: CaslAbilityFactory) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest()
+    const request = context.switchToHttp().getRequest();
     console.log(request);
     const user = request.user;
     const ability = await this.caslAbilityFactory.createForUser(user);

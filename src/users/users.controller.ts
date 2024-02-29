@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, SetMetadata, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '@prisma/client';
@@ -6,15 +6,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { Actions } from 'src/casl/actions.enum';
 import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService){}
-
-
-   
-    
-    
     // All Users
     @Get()
     @UseGuards(AuthGuard())
@@ -31,11 +27,17 @@ export class UsersController {
     // @UseGuards(AuthGuard(),CanActAuthguard)
     async getOne(
         @Param('id')id: string
-    ): Promise<User>{
-        // Convert the id to a number if necessary,
+    ){
         const numericId = parseInt(id,  10);
-        // Pass the id as part of an object that matches the UserWhereUniqueInput type
         return this.usersService.getOne({ id: numericId });
+    }
+
+    // New user
+    @Post('/')
+    async create(
+        @Body() userSignUpDto:UserSignUpDto,
+    ): Promise<{}>{
+        return this.usersService.Signup(userSignUpDto);
     }
 
     // View Trash

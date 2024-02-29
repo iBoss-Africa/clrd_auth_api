@@ -14,8 +14,8 @@ datasource db {
 
 model User {
   id        Int        @id @default(autoincrement())
-  firstName  String     @db.VarChar(30)
-  lastName  String      @db.VarChar(30)
+  firstName  String?     @db.VarChar(30)
+  lastName  String ?     @db.VarChar(30)
   email     String     @unique
   phone     String     @unique
   password  String     @db.VarChar(60)
@@ -42,7 +42,7 @@ model Company {
   companyName String @db.VarChar(100)
   email     String     @unique
   phone     String     @unique @db.VarChar(11)
-  category companyCategory @default(SME)  
+  category companyCategory? @default(SME)  
   country String? @db.VarChar(7)
   state String? @db.VarChar(40)
   city String? @db.VarChar(45)
@@ -50,8 +50,8 @@ model Company {
   postalCode String?
   cacUrl String?
   cacNo String?
-  user     User ? @relation(fields: [user_id], references: [id])
-  user_id Int?  @db.Integer()
+  admin     User ? @relation(fields: [admin_id], references: [id])
+  admin_id Int?  @db.Integer()
   deleted   Boolean    @default(false)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt()

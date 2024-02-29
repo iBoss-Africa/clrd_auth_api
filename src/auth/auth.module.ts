@@ -6,9 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
 import { JwtStrategy } from './jwt.strategy';
-import { CompanyModule } from 'src/company/company.module';
 
 @Module({
   imports:[
@@ -27,13 +25,12 @@ import { CompanyModule } from 'src/company/company.module';
         },
       };
     }
-  }),
+  }), 
   forwardRef(() => UsersModule ),
-  forwardRef(() => CompanyModule ),
   ],
   controllers: [AuthController],
-  providers: [CaslAbilityFactory,AuthService, PrismaService,JwtStrategy,],
-  exports: [AuthService,JwtStrategy, PrismaService,PassportModule]
-
+  providers: [AuthService, PrismaService,JwtStrategy],
+  exports: [AuthService, JwtStrategy, PrismaService, PassportModule]
 })
+
 export class AuthModule {}
