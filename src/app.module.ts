@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { CaslModule } from './casl/casl.module';
 import { CompanyModule } from './company/company.module';
 import { UsersModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
+import { PermissionsModule } from './permissions/permissions.module';
 
 
 @Module({
@@ -17,7 +19,9 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     CaslModule,
     UsersModule,
-    CompanyModule
+    CompanyModule,
+    RolesModule,
+    PermissionsModule,
   ],
   controllers: [],
   providers: [],

@@ -9,19 +9,17 @@ import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 
-
-@Controller('users')
+@Controller()
 export class UsersController {
     constructor(private readonly usersService: UsersService){}
     // All Users
     @Get()
-    @SetMetadata('action', Actions.Manage)
+    @SetMetadata('action', Actions.Read)
     @SetMetadata('subject', Subjects.User)
     @UseGuards(AuthGuard(),CanActAuthguard)
     async getAll(){
         return this.usersService.getAll();
     }
-
 
     @Get(':id')
     @SetMetadata('action', Actions.Read)
@@ -44,7 +42,6 @@ export class UsersController {
 
     // View Trash
     @Get('trash/all')
-    // @UseGuards(AuthGuard())
     @SetMetadata('action', Actions.Manage)
     @SetMetadata('subject', Subjects.User)
     @UseGuards(AuthGuard(),CanActAuthguard)
@@ -52,8 +49,7 @@ export class UsersController {
         return this.usersService.viewTrash();
     }
 
-
-   // Update user
+    // Update user
     @Patch('/:id')
     @SetMetadata('action', Actions.Create)
     @SetMetadata('subject', Subjects.User)
@@ -61,12 +57,11 @@ export class UsersController {
     async updateUser(
         @Body()
         updateUserDto: UpdateUserDto,
-        @Param('id')id: string,
+        @Param('id') id: string,
         @CurrentUser() user: User
-    ){
+    ) {
         return this.usersService.updateUser(parseInt(id), updateUserDto, user)
     }
-
 
      // restore deleted a user
     @Put('restore/:id')
@@ -85,8 +80,8 @@ export class UsersController {
     @SetMetadata('subject', Subjects.User)
     @UseGuards(AuthGuard(),CanActAuthguard)
     async trash(
-        @Param('id')id: string,
-    ){
+        @Param('id') id: string,
+    ) {
         return this.usersService.softDelet(parseInt(id))
     }
 }

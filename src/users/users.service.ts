@@ -11,12 +11,13 @@ export class UsersService {
         private prisma: PrismaService,
     ){}
 
+
     // get a single user
-    async getOne(criteria: Prisma.UserWhereUniqueInput): Promise<any>{
-        try{
+    async getOne(criteria: any): Promise<User> {
+        try {
             // Check for the user with the id
             const user = await this.prisma.user.findUnique({
-                where: {...criteria, deleted: false}
+                where: { ...criteria, deleted: false }
             });
 
             if(!user){
@@ -29,20 +30,21 @@ export class UsersService {
                 throw new BadRequestException('Bad request', error.message)
             }
         }
-        
+
     }
 
     // fetch all users
     async getAll(){
         try{
             const users = await this.prisma.user.findMany({where: {deleted: false}});
+
             return users;
-        }catch(error){
-            if(error instanceof Error){
-                throw new BadRequestException( 'Bad request', error.message)
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new BadRequestException('Bad request', error.message)
             }
         }
-        
+
     }
 
      // Signup users
@@ -79,27 +81,27 @@ export class UsersService {
     }
 
     // View Trash
+
     async viewTrash(){
         try{
             const users = await this.prisma.user.findMany({where: {deleted: true}});
 
             return users;
-        }catch(error){
-            if(error instanceof Error){
-                throw new BadRequestException( 'Bad request', error.message)
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new BadRequestException('Bad request', error.message)
             }
         }
-        
+
     }
 
     // Update user
-    async updateUser(id: number, updateUserDto:UpdateUserDto, user:User){
-        console.log(updateUserDto)
-        try{
-            const  {
-                firstName, 
-                lastName, 
-                avatar, 
+    async updateUser(id: number, updateUserDto: UpdateUserDto, user: User) {
+        try {
+            const {
+                firstName,
+                lastName,
+                avatar,
                 country,
                 driverLicenseNo,
                 state,
@@ -107,18 +109,18 @@ export class UsersService {
                 streetAddress,
                 postalCode,
                 driverLicenseUrl,
-             } = updateUserDto;
-    
-            if(id !== user.id){
+            } = updateUserDto;
+
+            if (id !== user.id) {
                 throw new NotFoundException('User not found!')
             }
-    
+
             const updateUser = await this.prisma.user.update({
-                where:{id: user.id},
+                where: { id: user.id },
                 data: {
-                    firstName, 
-                    lastName, 
-                    avatar, 
+                    firstName,
+                    lastName,
+                    avatar,
                     country,
                     driverLicenseNo,
                     state,
@@ -129,9 +131,9 @@ export class UsersService {
                 }
             })
             return updateUser;
-        }catch(error){
-            if(error instanceof Error){
-                throw new BadRequestException( 'Bad request', error.message)
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new BadRequestException('Bad request', error.message)
             }
         }
     }
@@ -169,5 +171,4 @@ export class UsersService {
             }
         }
     }
-
 }

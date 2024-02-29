@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports:[
@@ -26,7 +27,8 @@ import { JwtStrategy } from './jwt.strategy';
       };
     }
   }), 
-  forwardRef(() => UsersModule ),
+    forwardRef(() => UsersModule),
+    forwardRef(() => RolesModule),
   ],
   controllers: [AuthController],
   providers: [AuthService, PrismaService,JwtStrategy],

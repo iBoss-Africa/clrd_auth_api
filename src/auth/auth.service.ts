@@ -1,6 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import APIFeatures from 'src/utils/apiFeatures.utils';
@@ -13,7 +12,6 @@ export class AuthService {
         private userService: UsersService,
         private jwtService: JwtService
     ) { }
-
 
     async login(loginDto: LoginDto) {
 
@@ -43,5 +41,4 @@ export class AuthService {
             }
         }
     }
-
 }
