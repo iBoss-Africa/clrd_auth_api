@@ -1,6 +1,6 @@
 // casl-ability.factory.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AbilityBuilder, Ability } from '@casl/ability';
+import { AbilityBuilder } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import { Actions } from '../actions.enum';
 import { Subjects } from '../subjects.enum';
@@ -33,4 +33,5 @@ export class CaslAbilityFactory {
         }
         return build();
     }
+
 }

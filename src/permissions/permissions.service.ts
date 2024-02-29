@@ -7,8 +7,8 @@ import { PrismaService } from 'src/prisma.service';
 export class PermissionsService {
     constructor(private prisma: PrismaService) { }
 
-    async create(createPermissionDto: CreatePermissionDto) {
-        return this.prisma.permission.create({ data: createPermissionDto });
+    async create(createPermissionDto) {
+        return this.prisma.permission.create({data:createPermissionDto});
     }
 
     async findAll(criteria: Object) {

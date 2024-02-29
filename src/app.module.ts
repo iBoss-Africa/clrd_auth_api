@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { CaslModule } from './casl/casl.module';
-import { CompanyService } from './company/company.service';
 import { CompanyModule } from './company/company.module';
+import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 
@@ -18,10 +18,12 @@ import { PermissionsModule } from './permissions/permissions.module';
     PrismaService,
     AuthModule,
     CaslModule,
+    UsersModule,
+    CompanyModule,
     RolesModule,
     PermissionsModule,
   ],
   controllers: [],
-  providers: [CompanyService],
+  providers: [],
 })
 export class AppModule {}

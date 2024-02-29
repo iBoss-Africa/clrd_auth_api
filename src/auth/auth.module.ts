@@ -6,35 +6,33 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
 import { JwtStrategy } from './jwt.strategy';
-import { CompanyModule } from 'src/company/company.module';
 import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
-  imports: [
+  imports:[
     // Setting up JWT
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      // injecting the config seting
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        return {
-          // Do not use process.env here, it will read undefined.
-          secret: config.get<string>('jwt_secret'),
-          signOptions: {
-            expiresIn: config.get<string>('jwt_expires'),
-          },
-        };
-      }
-    }),
+    // injecting the config seting
+    imports: [ConfigModule],
+    inject: [ConfigService],
+    useFactory: (config: ConfigService) => {
+      return {
+        // Do not use process.env here, it will read undefined.
+        secret: config.get<string>('jwt_secret'),
+        signOptions: {
+          expiresIn: config.get<string>('jwt_expires'),
+        },
+      };
+    }
+  }), 
     forwardRef(() => UsersModule),
     forwardRef(() => RolesModule),
   ],
   controllers: [AuthController],
-  providers: [CaslAbilityFactory, AuthService, PrismaService, JwtStrategy,],
+  providers: [AuthService, PrismaService,JwtStrategy],
   exports: [AuthService, JwtStrategy, PrismaService, PassportModule]
-
 })
-export class AuthModule { }
+
+export class AuthModule {}

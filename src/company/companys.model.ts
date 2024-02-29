@@ -5,6 +5,7 @@ export class Companys implements Prisma.CompanyCreateInput{
     companyName: string;
     email: string;
     phone: string;
+    password: string;
     category?: $Enums.companyCategory;
     country?: string;
     state?: string;

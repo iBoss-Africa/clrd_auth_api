@@ -9,12 +9,12 @@ import { Subjects } from '../../casl/subjects.enum';
 export class CanActAuthguard implements CanActivate {
     constructor(
         private reflector: Reflector,
-        private caslAbilityFactory: CaslAbilityFactory) { }
+        private caslAbilityFactory: CaslAbilityFactory) {}
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest()
-        const user = request.user;
-        const ability = await this.caslAbilityFactory.createForUser(user);
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest()
+    const user = request.user;
+    const ability = await this.caslAbilityFactory.createForUser(user);
 
         const requiredAction = this.reflector.get<Actions>('action', context.getHandler());
         const requiredSubject = this.reflector.get<Subjects>('subject', context.getHandler());

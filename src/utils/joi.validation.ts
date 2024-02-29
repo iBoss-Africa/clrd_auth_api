@@ -17,9 +17,12 @@ export const RegisterUserSchema = Joi.object({
    });
 
   //  Login Validation
-export const LoginSchema = Joi.object({
+export const companySchema = Joi.object({
+    companyName: Joi.string().required(),
     email: Joi.string().email().required(),
-    password: Joi.string().required()
+    password: Joi.string().required(),
+    phone:Joi.string().required(),
+
 }).options({
     abortEarly: false,
   });
@@ -76,7 +79,7 @@ export class userValidation implements PipeTransform {
         const { error } = this.schema.validate(value, { abortEarly: false });
      
         if (error) {
-          throw new BadRequestException('Validation failed', error.toString());
+          throw new BadRequestException('Validation failed', error.stack);
       }
         return value;
     }
