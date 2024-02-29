@@ -1,17 +1,14 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 import * as bcrypt from 'bcryptjs';
-import APIFeatures from 'src/utils/apiFeatures.utils';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
     constructor(
         private prisma: PrismaService,
-        private jwtService: JwtService,
     ){}
 
     // get a single user
@@ -21,6 +18,10 @@ export class UsersService {
             const user = await this.prisma.user.findUnique({
                 where: {...criteria, deleted: false}
             });
+
+            if(!user){
+                throw new NotFoundException('User not found!');
+            }
 
             return  user;
         }catch(error){
@@ -55,8 +56,8 @@ export class UsersService {
             const user = await this.getOne({email});
             if(user) throw new ConflictException('Email already exist!');
 
-            // hash password
-            const hashPassword = await bcrypt.hash(password, 10);
+            const salt = 10
+            const hashPassword = await bcrypt.hash(password, salt);
 
             // Creating the new user
             const newUser = await this.prisma.user.create({
@@ -135,13 +136,38 @@ export class UsersService {
         }
     }
 
+    // Restore
+    async restoreUser(id: number){
+        try{
+            this.getOne({id}); 
+
+            return await this.prisma.user.update({
+                where: {id: id},
+                data: {deleted: false}
+            })
+        }catch(error){
+            if(error instanceof Error){
+                throw new BadRequestException( 'Bad request', error.message)
+            }
+        }
+        
+    }
+
     // Delete User
     async softDelet(id: number){
-        const user = this.getOne({id}); 
 
-        return await this.prisma.user.update({
-            where: {id: id},
-            data: {deleted: true}
-        })
+        try{
+            this.getOne({id}); 
+
+            return await this.prisma.user.update({
+                where: {id: id},
+                data: {deleted: true}
+            })
+        }catch(error){
+            if(error instanceof Error){
+                throw new BadRequestException( 'Bad request', error.message)
+            }
+        }
     }
+
 }
