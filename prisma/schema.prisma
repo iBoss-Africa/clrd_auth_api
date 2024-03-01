@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["fullTextIndex", "fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  firstName  String?     @db.VarChar(30)
+  lastName  String ?     @db.VarChar(30)
+  email     String     @unique
+  phone     String     @unique
+  password  String     @db.VarChar(60)
+  avatar    String?
+  country String? @db.VarChar(7)
+  state String? @db.VarChar(40)
+  city String? @db.VarChar(45)
+  streetAddress String? @db.VarChar(150)
+  postalCode String?
+  driverLicenseUrl String?
+  driverLicenseNo String?
+  isActive  Boolean    @default(false)
+  deleted   Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt()
+  role     Role ? @relation(fields: [roleId], references: [id])
+  roleId Int?  @db.Integer()
+  company   Company[]
+
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  companyName String @db.VarChar(100)
+  email     String     @unique
+  phone     String     @unique @db.VarChar(11)
+  category companyCategory? @default(SME)  
+  country String? @db.VarChar(7)
+  state String? @db.VarChar(40)
+  city String? @db.VarChar(45)
+  streetAddress String? @db.VarChar(150)
+  postalCode String?
+  cacUrl String?
+  cacNo String?
+  admin     User ? @relation(fields: [admin_id], references: [id])
+  admin_id Int?  @db.Integer()
+  deleted   Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt()
+}
+
+
+model Role {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  deleted        Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt()
+
+  permission Permission[]
+  user User[]
+}
+
+model Permission {
+  id         Int             @id @default(autoincrement())
+  role       Role @relation(fields: [roleId], references: [id])
+  roleId    Int     @db.Integer()
+  action     String  @db.VarChar()
+  subject    String  @db.VarChar()
+  inverted   Boolean @default(false)
+  conditions Json?   @db.JsonB()
+  reason     String? @db.Text()
+
+  deleted    Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt()
+}
+
+enum companyCategory {
+  INTERNATIONAL
+  NATIONAL
+  REGIONAL
+  SME
+}
