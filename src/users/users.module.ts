@@ -7,6 +7,7 @@ import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.f
 import { JwtService } from '@nestjs/jwt';
 import { CompanyService } from 'src/company/company.service';
 import { CompanyModule } from 'src/company/company.module';
+import { RolesService } from 'src/roles/roles.service';
 
 @Module({
   imports: [
