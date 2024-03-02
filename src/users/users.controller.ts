@@ -9,10 +9,11 @@ import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 
-@Controller()
+@Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService){}
-    // All Users
+
+
     @Get()
     @SetMetadata('action', Actions.Read)
     @SetMetadata('subject', Subjects.User)
@@ -22,9 +23,9 @@ export class UsersController {
     }
 
     @Get(':id')
+    @UseGuards(AuthGuard(),CanActAuthguard)
     @SetMetadata('action', Actions.Read)
     @SetMetadata('subject', Subjects.User)
-    @UseGuards(AuthGuard(),CanActAuthguard)
     async getOne(
         @Param('id')id: string
     ){
@@ -32,12 +33,36 @@ export class UsersController {
         return this.usersService.getOne({ id: numericId });
     }
 
-    // New user
+    @Get(':id/role')
+    @UseGuards(AuthGuard(),CanActAuthguard)
+    @SetMetadata('action', Actions.Read)
+    @SetMetadata('subject', Subjects.User)
+    async userRole(
+        @Param('id')id: string
+    ){
+        return this.usersService.getUserRole(parseInt(id));
+    }
+
+
     @Post('/')
     async create(
         @Body() userSignUpDto:UserSignUpDto,
     ): Promise<{}>{
         return this.usersService.Signup(userSignUpDto);
+    }
+
+
+    @Patch('/:id')
+    // @SetMetadata('action', Actions.Update)
+    // @SetMetadata('subject', Subjects.User)
+    @UseGuards(AuthGuard())
+    async updateUser(
+        @Body()
+        updateUserDto: UpdateUserDto,
+        @Param('id') id: string,
+        @CurrentUser() user: User
+    ) {
+        return this.usersService.updateUser(parseInt(id), updateUserDto, user)
     }
 
     // View Trash
@@ -49,25 +74,11 @@ export class UsersController {
         return this.usersService.viewTrash();
     }
 
-    // Update user
-    @Patch('/:id')
-    @SetMetadata('action', Actions.Create)
-    @SetMetadata('subject', Subjects.User)
-    @UseGuards(AuthGuard(),CanActAuthguard)
-    async updateUser(
-        @Body()
-        updateUserDto: UpdateUserDto,
-        @Param('id') id: string,
-        @CurrentUser() user: User
-    ) {
-        return this.usersService.updateUser(parseInt(id), updateUserDto, user)
-    }
-
      // restore deleted a user
     @Put('restore/:id')
+    @UseGuards(AuthGuard(),CanActAuthguard)
     @SetMetadata('action', Actions.Manage)
     @SetMetadata('subject', Subjects.User)
-    @UseGuards(AuthGuard(),CanActAuthguard)
      async restore(
          @Param('id')id: string,
      ){
@@ -76,12 +87,23 @@ export class UsersController {
 
     // soft delete a user
     @Delete('trash/:id')
-    @SetMetadata('action', Actions.Manage)
-    @SetMetadata('subject', Subjects.User)
     @UseGuards(AuthGuard(),CanActAuthguard)
+    @SetMetadata('action', Actions.Delete)
+    @SetMetadata('subject', Subjects.User)
     async trash(
         @Param('id') id: string,
     ) {
-        return this.usersService.softDelet(parseInt(id))
+        return this.usersService.softDelete(parseInt(id))
+    }
+
+    // Permanent Delete
+    @Delete('delete')
+    @UseGuards(AuthGuard(),CanActAuthguard)
+    @SetMetadata('action', Actions.Manage)
+    @SetMetadata('subject', Subjects.User)
+    async Delete(
+        @Body() requestBody: any,
+    ) {
+        return this.usersService.delete(requestBody.ids)
     }
 }

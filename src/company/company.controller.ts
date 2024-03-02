@@ -69,4 +69,15 @@ export class CompanyController {
     ){
         return this.companyService.softDelete(parseInt(id));
     }
+
+    // Permanent Delete
+    @Delete('delete')
+    @SetMetadata('action', Actions.Delete)
+    @SetMetadata('subject', Subjects.User)
+    @UseGuards(AuthGuard(),CanActAuthguard)
+    async Delete(
+        @Body() requestBody: any,
+    ) {
+        return this.companyService.delete(requestBody.ids)
+    }
 }

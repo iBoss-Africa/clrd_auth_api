@@ -1,104 +1,96 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException, } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 import * as bcrypt from 'bcryptjs';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class UsersService {
     constructor(
         private prisma: PrismaService,
+        // private roles: RolesService
     ){}
 
 
     // get a single user
     async getOne(criteria: any): Promise<User> {
-        try {
-            // Check for the user with the id
             const user = await this.prisma.user.findUnique({
-                where: { ...criteria, deleted: false }
+                where: { ...criteria}
             });
-
-            if(!user){
-                throw new NotFoundException('User not found!');
-            }
-
+            if(!user) throw new NotFoundException('User not found!');
             return  user;
-        }catch(error){
-            if(error instanceof Error){
-                throw new BadRequestException('Bad request', error.message)
-            }
-        }
 
+    }
+
+    async getUserRole(id: number): Promise<User>{
+         const user = await this.prisma.user.findUnique({
+            where: {id: id},
+            include: {role: true}
+        });
+        if(!user) throw new NotFoundException('User not found!');
+        return  user;
     }
 
     // fetch all users
     async getAll(){
-        try{
-            const users = await this.prisma.user.findMany({where: {deleted: false}});
-
-            return users;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new BadRequestException('Bad request', error.message)
-            }
-        }
-
+        const users = await this.prisma.user.findMany({where: {deleted: false}});
+        return users;
     }
 
      // Signup users
      async Signup(userSignUpDto:UserSignUpDto): Promise<{}>{
+        const {firstName, lastName, email, phone, password} = userSignUpDto;
+        const user =  this.getOne({email});
 
-        try{
+        if(user){ throw  new ConflictException('Email already exist!');}
 
-            // Extract the fields from the signuDto
-            const {firstName, lastName, email, phone, password} = userSignUpDto;
-            // check if the email already exist
-            const user = await this.getOne({email});
-            if(user) throw new ConflictException('Email already exist!');
+        const salt = 10
+        const hashPassword = await bcrypt.hash(password, salt);
 
-            const salt = 10
-            const hashPassword = await bcrypt.hash(password, salt);
-
-            // Creating the new user
-            const newUser = await this.prisma.user.create({
-                data: {
-                    firstName, 
-                    lastName, 
-                    email, 
-                    phone, 
-                    password: hashPassword
-                }
-            });
-            return {data: newUser};
-        }catch(error){
-            if(error instanceof Error){
-                console.log(error.stack)
-                throw new BadRequestException('Bad request', error.message);
+        const newUser = await this.prisma.user.create({
+            data: {
+                firstName, 
+                lastName, 
+                email, 
+                phone, 
+                password: hashPassword
             }
-        }
+        });
+        return {data: newUser};
+        
     }
 
     // View Trash
 
     async viewTrash(){
-        try{
-            const users = await this.prisma.user.findMany({where: {deleted: true}});
-
-            return users;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new BadRequestException('Bad request', error.message)
-            }
-        }
-
+        const users = await this.prisma.user.findMany({where: {deleted: true}});
+        return users;
     }
 
     // Update user
     async updateUser(id: number, updateUserDto: UpdateUserDto, user: User) {
-        try {
-            const {
+        const {
+            firstName,
+            lastName,
+            avatar,
+            country,
+            driverLicenseNo,
+            state,
+            city,
+            streetAddress,
+            postalCode,
+            driverLicenseUrl,
+        } = updateUserDto;
+
+        if (id !== user.id) {
+            throw new UnauthorizedException('you are not allowed!')
+        }
+
+        const updateUser = await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
                 firstName,
                 lastName,
                 avatar,
@@ -107,68 +99,40 @@ export class UsersService {
                 state,
                 city,
                 streetAddress,
-                postalCode,
                 driverLicenseUrl,
-            } = updateUserDto;
-
-            if (id !== user.id) {
-                throw new NotFoundException('User not found!')
+                postalCode,
             }
-
-            const updateUser = await this.prisma.user.update({
-                where: { id: user.id },
-                data: {
-                    firstName,
-                    lastName,
-                    avatar,
-                    country,
-                    driverLicenseNo,
-                    state,
-                    city,
-                    streetAddress,
-                    driverLicenseUrl,
-                    postalCode,
-                }
-            })
-            return updateUser;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new BadRequestException('Bad request', error.message)
-            }
-        }
+        })
+        return updateUser;
     }
 
     // Restore
     async restoreUser(id: number){
-        try{
-            this.getOne({id}); 
+        this.getOne({id}); 
 
-            return await this.prisma.user.update({
-                where: {id: id},
-                data: {deleted: false}
-            })
-        }catch(error){
-            if(error instanceof Error){
-                throw new BadRequestException( 'Bad request', error.message)
-            }
-        }
-        
+        return await this.prisma.user.update({
+            where: {id: id},
+            data: {deleted: false}
+        })
     }
 
     // Delete User
-    async softDelet(id: number){
+    async softDelete(id: number){
+        const user = this.getOne({id, delete: false}); 
+        if(!user) throw new NotFoundException('User not found!')
+        return await this.prisma.user.update({
+            where: {id: id},
+            data: {deleted: true}
+        })
 
-        try{
-            this.getOne({id}); 
+    }
 
-            return await this.prisma.user.update({
-                where: {id: id},
-                data: {deleted: true}
-            })
-        }catch(error){
-            if(error instanceof Error){
-                throw new BadRequestException( 'Bad request', error.message)
+    // Permanent Delete
+    async delete( ids: number[]){
+        return await this.prisma.user.deleteMany({
+            where: {
+                id: { in: ids}
             }
-        }
+        })
     }
 }
