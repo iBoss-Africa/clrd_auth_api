@@ -4,36 +4,26 @@ CREATE TYPE "companyCategory" AS ENUM ('INTERNATIONAL', 'NATIONAL', 'REGIONAL', 
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "firstName" VARCHAR(30) NOT NULL,
-    "lastName" VARCHAR(30) NOT NULL,
+    "firstName" VARCHAR(30),
+    "lastName" VARCHAR(30),
     "email" TEXT NOT NULL,
-    "phone" VARCHAR(11) NOT NULL,
+    "phone" TEXT NOT NULL,
     "password" VARCHAR(60) NOT NULL,
     "avatar" TEXT,
-    "isActive" BOOLEAN NOT NULL DEFAULT false,
-    "deleted" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "role_id" INTEGER,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Company" (
-    "id" SERIAL NOT NULL,
-    "companyName" VARCHAR(100) NOT NULL,
-    "category" "companyCategory" NOT NULL DEFAULT 'SME',
     "country" VARCHAR(7),
     "state" VARCHAR(40),
     "city" VARCHAR(45),
     "streetAddress" VARCHAR(150),
     "postalCode" TEXT,
-    "cacUrl" TEXT,
-    "cacNo" TEXT,
-    "user_id" INTEGER,
+    "driverLicenseUrl" TEXT,
+    "driverLicenseNo" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT false,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "roleId" INTEGER,
 
-    CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -50,7 +40,7 @@ CREATE TABLE "Role" (
 -- CreateTable
 CREATE TABLE "Permission" (
     "id" SERIAL NOT NULL,
-    "role_id" INTEGER NOT NULL,
+    "roleId" INTEGER NOT NULL,
     "action" VARCHAR NOT NULL,
     "subject" VARCHAR NOT NULL,
     "inverted" BOOLEAN NOT NULL DEFAULT false,
@@ -67,13 +57,13 @@ CREATE TABLE "Permission" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Company" ADD CONSTRAINT "Company_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Permission" ADD CONSTRAINT "Permission_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Permission" ADD CONSTRAINT "Permission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

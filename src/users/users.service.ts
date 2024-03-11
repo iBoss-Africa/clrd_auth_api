@@ -42,9 +42,9 @@ export class UsersService {
      // Signup users
      async Signup(userSignUpDto:UserSignUpDto): Promise<{}>{
         const {firstName, lastName, email, phone, password} = userSignUpDto;
-        const user =  this.getOne({email});
+        // const user =  this.getOne({email});
 
-        if(user){ throw  new ConflictException('Email already exist!');}
+        // if(user){ throw  new ConflictException('Email already exist!');}
 
         const salt = 10
         const hashPassword = await bcrypt.hash(password, salt);
