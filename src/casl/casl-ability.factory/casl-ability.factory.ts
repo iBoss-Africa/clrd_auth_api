@@ -26,8 +26,10 @@ export class CaslAbilityFactory {
 
         if (user.role.name === 'admin') {
             can(Actions.Manage, Subjects.All);
-        } else if (user.role.name == 'Manager') {
+        } else if (user.role.name === 'Manager') {
             can(Actions.Read, Subjects.Permission);
+        } else if (user.role.name === 'company') {
+            can(Actions.Manage, Subjects.Company);
         } else {
             can(Actions.Read, Subjects.User, { id: userPayload.id });
         }

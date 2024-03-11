@@ -32,5 +32,10 @@ export class UserSignUpDto {
     @ApiProperty()
     @IsOptional()
     @IsInt()
+    readonly roleId: number;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsInt()
     readonly companyId: number
 }

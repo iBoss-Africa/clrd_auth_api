@@ -17,14 +17,7 @@ export class AuthService {
 
         try {
             const { email, password } = loginDto;
-
-            // check if the email already exist
-            const user = await this.userService.getOne({ email });
-            if (!user) {
-                throw new NotFoundException('Invalid email or password');
-            }
-
-            // check if password is correct or not
+            const user = await this.userService.view({ email });
             const isPasswordMatch = await bcrypt.compare(password, user.password);
 
             if (!isPasswordMatch) {

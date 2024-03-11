@@ -6,22 +6,26 @@ import { CompanySignUpDto } from './dto/companySignup.dto';
 import { Actions } from 'src/casl/actions.enum';
 import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { Subjects } from 'src/casl/subjects.enum';
-import { UsersService } from 'src/users/users.service';
 import { lastValueFrom } from 'rxjs';
+import { UsersService } from 'src/users/users.service';
+import { RolesService } from 'src/roles/roles.service';
+import APIFeatures from 'src/utils/apiFeatures.utils';
+import { JwtService } from '@nestjs/jwt';
 
-// @UseGuards(AuthGuard(), CanActAuthguard)
 @Controller('company')
 export class CompanyController {
     constructor(
         @Inject('CLRD_SERVICE')
         private client: ClientProxy,
-        private userService: UsersService
+        private userService: UsersService,
+        private roleService: RolesService
     ) { }
 
 
     @Get()
-    // @SetMetadata('action', Actions.Manage)
-    // @SetMetadata('subject', Subjects.User)
+    @UseGuards(AuthGuard(), CanActAuthguard)
+    @SetMetadata('action', Actions.Manage)
+    @SetMetadata('subject', Subjects.Company)
     async getAll() {
         return this.client.send({ cmd: 'get-companies' }, {});
     }
@@ -43,26 +47,22 @@ export class CompanyController {
     ) {
         const resp = await this.client.send({ cmd: 'create-company' }, companySignUpDto);
         const { companyData } = await lastValueFrom(resp);
-        const { email, id: companyId } = companyData;
-        await this.userService.Signup({
-            email, companyId, password: companySignUpDto.password,
-            firstName: '',
-            lastName: '',
-            phone: ''
-        });
-        return companyData;
+        const token = await this.signupCompany(companyData, companySignUpDto);
+        return { id: companyData.id, token }
     }
 
-    // @Patch('/:id')
-    // // @UseGuards(AuthGuard())
-    // async updateOne(
-    //     @Param('id') id: string, //company id
-    //     @Body()
-    //     updateCompanyDto: UpdateCompanyDto,
+    @Patch('/:id')
+    @UseGuards(AuthGuard(), CanActAuthguard)
+    @SetMetadata('action', Actions.Update)
+    @SetMetadata('subject', Subjects.Company)
+    async updateOne(
+        @Param('id') id: string, //company id
+        @Body()
+        updateCompanyDto: UpdateCompanyDto,
 
-    // ) {
-    //     return this.companyService.updateOne(parseInt(id), updateCompanyDto)
-    // }
+    ) {
+        return this.client.send({ cmd: 'update-company' }, { id, companyData: updateCompanyDto });
+    }
 
     // @Put('/restore/:id')
     // @SetMetadata('action', Actions.Manage)
@@ -93,4 +93,16 @@ export class CompanyController {
     // ) {
     //     return this.companyService.delete(requestBody.ids)
     // }
+
+    async signupCompany(companyData, companySignUpDto: CompanySignUpDto) {
+        const { email, id: companyId } = companyData;
+        const companyRole = await this.roleService.view({ name: Subjects.Company.toLowerCase() });
+        const user = await this.userService.Signup({
+            email, companyId, password: companySignUpDto.password, roleId: companyRole.id,
+            firstName: '',
+            lastName: '',
+            phone: ''
+        });
+        return APIFeatures.assignJwtToken({ id: user.id, email: user.email }, new JwtService);
+    }
 }

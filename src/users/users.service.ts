@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException, } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException, } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -42,7 +42,7 @@ export class UsersService {
     }
 
     // Signup users
-    async Signup(userSignUpDto: UserSignUpDto): Promise<{}> {
+    async Signup(userSignUpDto: UserSignUpDto): Promise<User> {
         const { email, phone, password } = userSignUpDto;
         const user = await this.getOne({ email });
 
@@ -57,7 +57,7 @@ export class UsersService {
                 password: hashPassword
             }
         });
-        return { data: this.sanitizeUser(newUser) };
+        return this.sanitizeUser(newUser);
     }
 
     // View Trash

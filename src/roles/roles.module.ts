@@ -11,5 +11,6 @@ import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.f
   controllers: [RolesController],
   providers: [RolesService, UsersService, PrismaService, PermissionsService, CaslAbilityFactory],
   imports: [forwardRef(() => AuthModule)],
+  exports: [RolesService]
 })
 export class RolesModule { }
