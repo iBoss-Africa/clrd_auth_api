@@ -43,7 +43,7 @@ export class UsersService {
 
     // Signup users
     async Signup(userSignUpDto: UserSignUpDto): Promise<{}> {
-        const { firstName, lastName, email, phone, password } = userSignUpDto;
+        const { email, phone, password } = userSignUpDto;
         const user = await this.getOne({ email });
 
         if (user) { throw new ConflictException('Email already exist!'); }
@@ -53,15 +53,11 @@ export class UsersService {
 
         const newUser = await this.prisma.user.create({
             data: {
-                firstName,
-                lastName,
-                email,
-                phone,
+                ...userSignUpDto,
                 password: hashPassword
             }
         });
         return { data: this.sanitizeUser(newUser) };
-
     }
 
     // View Trash
