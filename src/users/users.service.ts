@@ -20,7 +20,7 @@ export class UsersService {
         });
     }
 
-    async view(criteria: any): Promise<User> {
+    async view(criteria: any): Promise<User> { 
         const user = await this.getOne(criteria);
         if (!user) throw new NotFoundException('User not found!');
         return this.sanitizeUser(user);
@@ -37,7 +37,7 @@ export class UsersService {
 
     // fetch all users
     async getAll() {
-        const users = await this.prisma.user.findMany({ where: { deleted: false } });
+        const users = (await this.prisma.user.findMany({ where: { deleted: false } }));
         return users.map(user => this.sanitizeUser(user));
     }
 
