@@ -34,6 +34,8 @@ model User {
   role     Role ? @relation(fields: [roleId], references: [id])
   roleId Int?  @db.Integer()
   companyId   Int? @db.Integer()
+  token Int?
+  expiresIn DateTime?
 
   @@index(fields: [companyId, phone, roleId])
 }

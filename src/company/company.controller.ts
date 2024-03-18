@@ -75,8 +75,8 @@ export class CompanyController {
     }
 
     @Delete('/trash/:id')
-    // @SetMetadata('action', Actions.Manage)
-    // @SetMetadata('subject', Subjects.User)
+    @SetMetadata('action', Actions.Manage)
+    @SetMetadata('subject', Subjects.User)
     async softDelete(
         @Param('id')
         id: string,

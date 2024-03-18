@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get,  Req, Param, Patch, Post, Put, SetMetadata, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '@prisma/client';
@@ -8,6 +8,8 @@ import { Subjects } from 'src/casl/subjects.enum';
 import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
+import {VerifyEmailDto} from './dto/verifyEmail.dto';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -51,6 +53,26 @@ export class UsersController {
         return this.usersService.Signup(userSignUpDto);
     }
 
+    @Patch('/verify')
+    async verifyEmail(
+        @Req() req: Request,
+        @Body() verifyEmailDto:VerifyEmailDto,
+    ): Promise<any>{
+        const protocol = req.protocol;
+        const host = req.get('host');
+        return this.usersService.verifyEmail(verifyEmailDto, protocol, host);
+    }
+
+
+    @UseGuards(AuthGuard())
+    @Patch('/activate')
+    async activateEmail(
+        @Body() body:any,
+        @CurrentUser() user: User
+    ): Promise<any>{
+        return this.usersService.activateEmail(body, user);
+    }
+
 
     @Patch('/:id')
     // @SetMetadata('action', Actions.Update)
@@ -74,16 +96,16 @@ export class UsersController {
         return this.usersService.viewTrash();
     }
 
-     // restore deleted a user
+    // restore deleted a user
     @Put('restore/:id')
     @UseGuards(AuthGuard(),CanActAuthguard)
     @SetMetadata('action', Actions.Manage)
     @SetMetadata('subject', Subjects.User)
      async restore(
-         @Param('id')id: string,
+        @Param('id')id: string,
      ){
-         return this.usersService.restoreUser(parseInt(id))
-     }
+        return this.usersService.restoreUser(parseInt(id))
+    }
 
     // soft delete a user
     @Delete('trash/:id')

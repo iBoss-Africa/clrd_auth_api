@@ -10,7 +10,7 @@ import { LoginDto } from './dto/login.dto';
 export class AuthService {
     constructor(
         private userService: UsersService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
     ) { }
 
     async login(loginDto: LoginDto) {
@@ -24,7 +24,9 @@ export class AuthService {
                 throw new UnauthorizedException('Invalid email or password');
             }
 
-            // Generate token
+            
+
+            // const mail = await Email.welcomeMail( user.email, user.firstName)
             const token = await APIFeatures.assignJwtToken(user, this.jwtService);
 
             return { token, data: user }
