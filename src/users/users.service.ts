@@ -5,16 +5,15 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 import * as bcrypt from 'bcryptjs';
 import { VerifyEmailDto } from './dto/verifyEmail.dto';
-import Email from '../utils/email'
-import { Request } from 'express';
 import APIFeatures from 'src/utils/apiFeatures.utils';
-
+import { MailService } from 'src/mail/mail.service';
 
 
 @Injectable()
 export class UsersService {
     constructor(
         private prisma: PrismaService,
+        private readonly mailService:MailService
         // private roles: RolesService
     ) { }
 
@@ -69,6 +68,7 @@ export class UsersService {
     // Verify Email
     async verifyEmail( verifyEmailDto: VerifyEmailDto, protocol: string, host: string){
         const { email } = verifyEmailDto;
+
         const user = await this.getOne({email});
         if(!user) throw new NotFoundException('Not Found!');
         
@@ -84,15 +84,9 @@ export class UsersService {
     })
 
     const verifyLink = `${protocol}://${host}/v1/api/users/activate`;
-    try{
-        await Email.verifyEmail(user.email, user.firstName, verifyLink, otp.token);
+    
+        this.mailService.verifyEmail(user.email, user.firstName, verifyLink, otp.token);
         return 'Email sent Successfully.'
-
-    }catch(error){
-        if(error){
-            return 'Email not sent!'
-        }
-    }
 
     }
 

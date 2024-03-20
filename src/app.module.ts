@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { MailModule } from './mail/mail.module';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
         UsersModule,
         RolesModule,
         PermissionsModule,
+        MailModule,
     ],
     controllers: [CompanyController],
     providers: [{

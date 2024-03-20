@@ -5,10 +5,11 @@ import { UsersController } from './users.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
 import { JwtService } from '@nestjs/jwt';
-
+import { MailModule } from 'src/mail/mail.module';
+import { MailService } from 'src/mail/mail.service';
 @Module({
   imports: [forwardRef(() => AuthModule)],
-  providers: [CaslAbilityFactory, UsersService, PrismaService, JwtService],
+  providers: [CaslAbilityFactory, UsersService,MailService, PrismaService, JwtService],
   exports: [UsersService],
   controllers: [UsersController],
 

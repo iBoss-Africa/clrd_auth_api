@@ -60,7 +60,7 @@ export class UsersController {
     ): Promise<any>{
         const protocol = req.protocol;
         const host = req.get('host');
-        return this.usersService.verifyEmail(verifyEmailDto, protocol, host);
+            return this.usersService.verifyEmail(verifyEmailDto, protocol, host);  
     }
 
 
