@@ -18,4 +18,14 @@ export default class APIFeatures {
         const token = jwtService.sign(payload, { secret: config.get<string>('JWT_SECRET') });
         return token;
     }
+
+    static async generateOtp(){
+        const token = Math.floor(1000 + Math.random() *  9000);
+        const currentTime = new Date();
+        const config = new ConfigService();
+        const otpExpires = new Date(currentTime.getTime() + config.get<any>('OTP_EXPIRES') * 60 * 1000);
+
+        return {token, otpExpires }
+    
+    }
 }

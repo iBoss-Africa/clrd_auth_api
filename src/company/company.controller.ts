@@ -64,24 +64,25 @@ export class CompanyController {
         return this.client.send({ cmd: 'update-company' }, { id, companyData: updateCompanyDto });
     }
 
-    // @Put('/restore/:id')
-    // @SetMetadata('action', Actions.Manage)
-    // @SetMetadata('subject', Subjects.User)
-    // async restore(
-    //     @Param('id') id: string,
-    // ) {
-    //     return this.companyService.restoreCompany(parseInt(id));
-    // }
+    @Put('/restore/:id')
+    @SetMetadata('action', Actions.Manage)
+    @SetMetadata('subject', Subjects.User)
+    async restore(
+        @Param('id') id: string,
+    ) {
+        return this.client.send({ cmd: 'restore-company' }, { id });
+        ;
+    }
 
-    // @Delete('/trash/:id')
-    // @SetMetadata('action', Actions.Manage)
-    // @SetMetadata('subject', Subjects.User)
-    // async softDelete(
-    //     @Param('id')
-    //     id: string,
-    // ) {
-    //     return this.companyService.softDelete(parseInt(id));
-    // }
+    @Delete('/trash/:id')
+    @SetMetadata('action', Actions.Manage)
+    @SetMetadata('subject', Subjects.User)
+    async softDelete(
+        @Param('id')
+        id: string,
+    ) {
+        return this.client.send({ cmd: 'delete-company' }, { id });
+    }
 
     // // Permanent Delete
     // @Delete('delete')

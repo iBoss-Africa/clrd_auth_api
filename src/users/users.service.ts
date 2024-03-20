@@ -1,14 +1,19 @@
-import { ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException, } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Redirect, UnauthorizedException, } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 import * as bcrypt from 'bcryptjs';
+import { VerifyEmailDto } from './dto/verifyEmail.dto';
+import APIFeatures from 'src/utils/apiFeatures.utils';
+import { MailService } from 'src/mail/mail.service';
+
 
 @Injectable()
 export class UsersService {
     constructor(
         private prisma: PrismaService,
+        private readonly mailService:MailService
         // private roles: RolesService
     ) { }
 
@@ -20,7 +25,7 @@ export class UsersService {
         });
     }
 
-    async view(criteria: any): Promise<User> {
+    async view(criteria: any): Promise<User> { 
         const user = await this.getOne(criteria);
         if (!user) throw new NotFoundException('User not found!');
         return this.sanitizeUser(user);
@@ -37,7 +42,7 @@ export class UsersService {
 
     // fetch all users
     async getAll() {
-        const users = await this.prisma.user.findMany({ where: { deleted: false } });
+        const users = (await this.prisma.user.findMany({ where: { deleted: false } }));
         return users.map(user => this.sanitizeUser(user));
     }
 
@@ -60,8 +65,61 @@ export class UsersService {
         return this.sanitizeUser(newUser);
     }
 
-    // View Trash
+    // Verify Email
+    async verifyEmail( verifyEmailDto: VerifyEmailDto, protocol: string, host: string){
+        const { email } = verifyEmailDto;
 
+        const user = await this.getOne({email});
+        if(!user) throw new NotFoundException('Not Found!');
+        
+        // Generate token
+        const otp = await APIFeatures.generateOtp();
+
+        await this.prisma.user.update({where:{
+            email: email
+        }, data: {
+            token: otp.token,
+            expiresIn: otp.otpExpires
+        }
+    })
+
+    const verifyLink = `${protocol}://${host}/v1/api/users/activate`;
+    
+        this.mailService.verifyEmail(user.email, user.firstName, verifyLink, otp.token);
+        return 'Email sent Successfully.'
+
+    }
+
+    async activateEmail(body: {token: number}, user: User){
+        const currentTime = new Date();
+        const verifyToken  = await this.prisma.user.findFirst({
+            where: {
+                token: body.token, 
+                expiresIn: {
+                    gte: new Date(currentTime.getTime()),
+                }
+            }
+        });
+
+        if(!verifyToken){throw new BadRequestException('Token not found or expired'); }
+
+        if(user.token !== body.token){
+            return new BadRequestException('Invalid token')
+        }else{
+            return await this.prisma.user.update({
+                where: {id: user.id},
+                data:{
+                    token: null,
+                    expiresIn: null,
+                    status:'ACTIVE'
+                }
+            })
+        }
+
+
+    }
+
+    // View Trash
     async viewTrash() {
         const users = await this.prisma.user.findMany({ where: { deleted: true } });
         return users;
@@ -83,7 +141,7 @@ export class UsersService {
         } = updateUserDto;
 
         if (id !== user.id) {
-            throw new UnauthorizedException('you are not allowed!')
+            throw new UnauthorizedException('you are not allowed!');
         }
 
         const updateUser = await this.prisma.user.update({

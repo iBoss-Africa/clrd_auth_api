@@ -10,27 +10,29 @@ import { LoginDto } from './dto/login.dto';
 export class AuthService {
     constructor(
         private userService: UsersService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
     ) { }
 
     async login(loginDto: LoginDto) {
 
         try {
             const { email, password } = loginDto;
-            const user = await this.userService.view({ email });
+            const user = await this.userService.getOne({ email });
             const isPasswordMatch = await bcrypt.compare(password, user.password);
 
             if (!isPasswordMatch) {
                 throw new UnauthorizedException('Invalid email or password');
             }
 
-            // Generate token
+            
+
+            // const mail = await Email.welcomeMail( user.email, user.firstName)
             const token = await APIFeatures.assignJwtToken(user, this.jwtService);
 
             return { token, data: user }
         } catch (error) {
             if (error instanceof Error) {
-                throw new BadRequestException('Bad request', error.message)
+                throw new BadRequestException('Bad request', error.stack)
             }
         }
     }
