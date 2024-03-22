@@ -9,6 +9,7 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { MailModule } from './mail/mail.module';
+import { CustomLogger } from './customLogger';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { MailModule } from './mail/mail.module';
         MailModule,
     ],
     controllers: [CompanyController],
-    providers: [{
+    providers: [
+        {
         provide: 'CLRD_SERVICE',
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => {
@@ -37,6 +39,13 @@ import { MailModule } from './mail/mail.module';
                 }
             })
         }
-    }],
+    },
+    {
+        provide: CustomLogger,
+        useValue: CustomLogger,
+    }
+],
+
+    exports: [CustomLogger],
 })
 export class AppModule { }

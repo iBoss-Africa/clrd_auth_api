@@ -7,9 +7,10 @@ import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.f
 import { JwtService } from '@nestjs/jwt';
 import { MailModule } from 'src/mail/mail.module';
 import { MailService } from 'src/mail/mail.service';
+import { CustomLogger } from 'src/customLogger';
 @Module({
   imports: [forwardRef(() => AuthModule)],
-  providers: [CaslAbilityFactory, UsersService,MailService, PrismaService, JwtService],
+  providers: [CustomLogger,CaslAbilityFactory, UsersService,MailService, PrismaService, JwtService],
   exports: [UsersService],
   controllers: [UsersController],
 

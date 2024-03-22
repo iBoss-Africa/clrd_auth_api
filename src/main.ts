@@ -1,10 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+
+  const logger = new Logger('bootstrap');
+
+  const app = await NestFactory.create(AppModule,{
+  });
+
   const configService = app.get<ConfigService>(ConfigService);
   app.enableCors();
 
@@ -22,5 +27,7 @@ async function bootstrap() {
   SwaggerModule.setup('v1/api', app, document);
 
   await app.listen(configService.get('PORT'));
+  logger.log(`Application running to port: ${configService.get('PORT')}`);
+
 }
 bootstrap();

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get,  Req, Param, Patch, Post, Put, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get,  Req, Param, Patch, Post, Put, SetMetadata, UseGuards, InternalServerErrorException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '@prisma/client';
@@ -10,10 +10,16 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserSignUpDto } from 'src/users/dto/userSignup.dto';
 import {VerifyEmailDto} from './dto/verifyEmail.dto';
 import { Request } from 'express';
+import { CustomLogger } from 'src/customLogger';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService){}
+
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly customLogger: CustomLogger,
+ 
+        ){}
 
 
     @Get()
@@ -60,7 +66,15 @@ export class UsersController {
     ): Promise<any>{
         const protocol = req.protocol;
         const host = req.get('host');
-            return this.usersService.verifyEmail(verifyEmailDto, protocol, host);  
+
+        // try{
+        
+        // }catch(error){
+        //     this.customLogger.debug(`Failed while trying to send a mail to ${email}`)
+        //     throw new InternalServerErrorException();
+        // } 
+        return this.usersService.verifyEmail(verifyEmailDto, protocol, host);  
+           
     }
 
 
@@ -92,7 +106,10 @@ export class UsersController {
     @SetMetadata('action', Actions.Manage)
     @SetMetadata('subject', Subjects.User)
     @UseGuards(AuthGuard(),CanActAuthguard)
-    async getTrash(){
+    async getTrash(
+        @CurrentUser() user: User
+
+    ){
         return this.usersService.viewTrash();
     }
 

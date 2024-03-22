@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Redirect, UnauthorizedException, } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException, Redirect, UnauthorizedException, } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -7,11 +7,13 @@ import * as bcrypt from 'bcryptjs';
 import { VerifyEmailDto } from './dto/verifyEmail.dto';
 import APIFeatures from 'src/utils/apiFeatures.utils';
 import { MailService } from 'src/mail/mail.service';
+import { CustomLogger } from 'src/customLogger';
 
 
 @Injectable()
 export class UsersService {
     constructor(
+        private readonly customLogger: CustomLogger,
         private prisma: PrismaService,
         private readonly mailService:MailService
         // private roles: RolesService
@@ -42,27 +44,38 @@ export class UsersService {
 
     // fetch all users
     async getAll() {
+       
         const users = (await this.prisma.user.findMany({ where: { deleted: false } }));
         return users.map(user => this.sanitizeUser(user));
     }
 
     // Signup users
     async Signup(userSignUpDto: UserSignUpDto): Promise<User> {
-        const { email, phone, password } = userSignUpDto;
-        const user = await this.getOne({ email });
+            const { email, phone, password } = userSignUpDto;
+            const user = await this.getOne({ email });
 
-        if (user) { throw new ConflictException('Email already exist!'); }
+            if (user) { throw new ConflictException('Email already exist!'); }
 
-        const salt = 10
-        const hashPassword = await bcrypt.hash(password, salt);
+            const salt = 10
+            const hashPassword = await bcrypt.hash(password, salt);
 
-        const newUser = await this.prisma.user.create({
-            data: {
-                ...userSignUpDto,
-                password: hashPassword
-            }
-        });
-        return this.sanitizeUser(newUser);
+        try{
+            const newUser = await this.prisma.user.create({
+                data: {
+                    ...userSignUpDto,
+                    password: hashPassword
+                }
+            });
+       
+
+            await this.mailService.welcomeMail(newUser.email,newUser.lastName)
+            this.customLogger.error(`New User created ${email}`);
+            return this.sanitizeUser(newUser);
+
+        }catch(error){
+            this.customLogger.error(`user not created ${email}`, error.stack);
+            throw new InternalServerErrorException(error);
+       }
     }
 
     // Verify Email
@@ -70,24 +83,23 @@ export class UsersService {
         const { email } = verifyEmailDto;
 
         const user = await this.getOne({email});
-        if(!user) throw new NotFoundException('Not Found!');
+        if(!user) throw new HttpException('Not Found!', HttpStatus.NOT_FOUND);
         
         // Generate token
         const otp = await APIFeatures.generateOtp();
 
         await this.prisma.user.update({where:{
-            email: email
-        }, data: {
-            token: otp.token,
-            expiresIn: otp.otpExpires
-        }
-    })
+                email: email
+            }, data: {
+                token: otp.token,
+                expiresIn: otp.otpExpires
+            }
+        })
 
-    const verifyLink = `${protocol}://${host}/v1/api/users/activate`;
+        const verifyLink = `${protocol}://${host}/v1/api/users/activate`;
     
-        this.mailService.verifyEmail(user.email, user.firstName, verifyLink, otp.token);
+        await this.mailService.verifyEmail(user.email, user.firstName, verifyLink, otp.token);
         return 'Email sent Successfully.'
-
     }
 
     async activateEmail(body: {token: number}, user: User){
@@ -104,7 +116,7 @@ export class UsersService {
         if(!verifyToken){throw new BadRequestException('Token not found or expired'); }
 
         if(user.token !== body.token){
-            return new BadRequestException('Invalid token')
+            return new HttpException('Invalid token', HttpStatus.BAD_REQUEST)
         }else{
             return await this.prisma.user.update({
                 where: {id: user.id},
@@ -115,8 +127,6 @@ export class UsersService {
                 }
             })
         }
-
-
     }
 
     // View Trash

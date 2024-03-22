@@ -1,32 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config'; 
+import { CustomLogger } from 'src/customLogger';
 
 @Injectable()
 export class MailService {
+
     constructor(
+        private readonly customLogger: CustomLogger,
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService, 
     ) {}
 
     async welcomeMail(email: string, name: string ){
-        
-        const config = new ConfigService();
-    
         const mailOptions={
-          from: config.get<string>('ZOHO_EMAIL_USER'),
+          from: this.configService.get<string>('ZOHO_EMAIL_USER'),
           to: email, 
           subject: 'Welcome',
+          template:'welcome',
           context: { 
                 name: name
             },
         }
     
         try {
+            this.customLogger.debug(`Welcome mail to be sent to ${email}`);
             await this.mailerService.sendMail(mailOptions);
-            return 'Email sent successfully';
         } catch (error) {
-            console.error('Error sending email:', error);
+            this.customLogger.debug(`Failed while trying to send a mail to ${email}`, error.stack);
+            return  new InternalServerErrorException();
         }
     
       }
@@ -44,10 +46,11 @@ export class MailService {
             },
         };
         try {
+            this.customLogger.debug(`Verification mail to be sent to ${email}`);
             await this.mailerService.sendMail(mailOptions);
-            return 'Email sent successfully';
         } catch (error) {
-            console.error('Error sending email:', error);
+            this.customLogger.error(`Failed while trying to send a mail to ${email}`, error.stack);
+            throw new InternalServerErrorException('Failed to send verification email', error);
         }
     }
 }

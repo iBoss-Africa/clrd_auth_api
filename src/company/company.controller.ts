@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards, SetMetadata, Inject } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards, SetMetadata, Inject, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { UpdateCompanyDto } from './dto/update.company.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Controller('company')
 export class CompanyController {
+    private logger =new Logger()
     constructor(
         @Inject('CLRD_SERVICE')
         private client: ClientProxy,
@@ -48,7 +49,9 @@ export class CompanyController {
         const resp = await this.client.send({ cmd: 'create-company' }, companySignUpDto);
         const { companyData } = await lastValueFrom(resp);
         const token = await this.signupCompany(companyData, companySignUpDto);
+        this.logger.verbose(`${companySignUpDto.companyName} is creating an account`)
         return { id: companyData.id, token }
+
     }
 
     @Patch('/:id')

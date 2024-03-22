@@ -8,6 +8,7 @@ import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { RolesModule } from 'src/roles/roles.module';
+import { CustomLogger } from 'src/customLogger';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { RolesModule } from 'src/roles/roles.module';
     forwardRef(() => RolesModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy],
+  providers: [CustomLogger, AuthService, PrismaService, JwtStrategy],
   exports: [AuthService, JwtStrategy, PrismaService, PassportModule]
 })
 
