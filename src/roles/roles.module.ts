@@ -6,10 +6,13 @@ import { RolesController } from './roles.controller';
 import { PermissionsService } from 'src/permissions/permissions.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
+import { MailModule } from 'src/mail/mail.module';
+import { CustomLogger } from 'src/customLogger';
 
 @Module({
   controllers: [RolesController],
-  providers: [RolesService, UsersService, PrismaService, PermissionsService, CaslAbilityFactory],
-  imports: [forwardRef(() => AuthModule)],
+  providers: [CustomLogger, RolesService, UsersService, PrismaService, PermissionsService, CaslAbilityFactory],
+  imports: [forwardRef(() => AuthModule),forwardRef(() => MailModule)],
+  exports: [RolesService]
 })
 export class RolesModule { }

@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, UserStatus } from "@prisma/client";
 
-export class Users implements Prisma.UserCreateInput{
+export class Users implements Prisma.UserCreateInput {
     id: number;
     firstName: string;
     lastName: string;
@@ -8,11 +8,11 @@ export class Users implements Prisma.UserCreateInput{
     password: string;
     phone: string;
     avatar?: string;
-    isActive?: boolean;
+    status?: UserStatus;
     deleted?: boolean;
     createdAt?: string | Date;
     updatedAt?: string | Date;
     role: Prisma.RoleCreateNestedOneWithoutUserInput;
-   
+    companyId: number;
 }
 

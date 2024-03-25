@@ -1,11 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as dotenv from 'dotenv'
+import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
-  dotenv.config()
-  const app = await NestFactory.create(AppModule);
+
+  const logger = new Logger('bootstrap');
+
+  const app = await NestFactory.create(AppModule,{
+  });
+
+  const configService = app.get<ConfigService>(ConfigService);
+  app.enableCors();
 
   app.setGlobalPrefix('v1/api/');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
@@ -20,6 +26,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('v1/api', app, document);
 
-  await app.listen(3000);
+  await app.listen(configService.get('PORT'));
+  logger.log(`Application running to port: ${configService.get('PORT')}`);
+
 }
 bootstrap();

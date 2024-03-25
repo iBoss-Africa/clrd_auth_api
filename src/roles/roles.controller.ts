@@ -7,13 +7,13 @@ import { CanActAuthguard } from 'src/auth/guard/canact.auth.guard';
 import { Subjects } from 'src/casl/subjects.enum';
 
 @Controller('roles')
-@UseGuards(AuthGuard(), CanActAuthguard)
+// @UseGuards(AuthGuard(), CanActAuthguard)
 export class RolesController {
     constructor(private readonly rolesService: RolesService) { }
 
     @Post()
-    @SetMetadata('action', Actions.Create)
-    @SetMetadata('subject', Subjects.Role)
+    // @SetMetadata('action', Actions.Create)
+    // @SetMetadata('subject', Subjects.Role)
     create(@Body() createRoleDto: RoleDto) {
         return this.rolesService.create(createRoleDto);
     }

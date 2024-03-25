@@ -1,19 +1,29 @@
-import { INestApplication, OnModuleInit } from "@nestjs/common";
+// prisma.service.ts
+import { INestApplication, InternalServerErrorException, OnModuleInit } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { Logger } from "@nestjs/common";
 
+export class PrismaService extends PrismaClient implements OnModuleInit {
+ 
 
-
-export class PrismaService extends PrismaClient implements OnModuleInit{
-
-    async  onModuleInit() {
-        await this.$connect()
+    async onModuleInit() {
+        const logger  = new Logger('Database connection')
+        try {
+        logger.log('Connecting to the database...');
+        await this.$connect();
+        logger.log('Connected 😁😁');
+        } catch (error) {
+            logger.verbose('Failed to connect to the database 🔥🔥🔥', error.stack);
+            throw new InternalServerErrorException('Connection Failed! shutting down...', error);
+        }
     }
 
-    async enableShutdownHooks(app: INestApplication){
-        
+    async enableShutdownHooks(app: INestApplication) {
+        const logger  = new Logger()
+
         process.on('SIGINT', async () => {
-            console.log('Received SIGINT. Shutting down gracefully...');
-            await app.close();
+            logger.log('Received SIGINT. Shutting down gracefully...');
+        await app.close();
         });
     }
 }

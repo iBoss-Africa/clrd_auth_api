@@ -8,31 +8,31 @@ import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { RolesModule } from 'src/roles/roles.module';
+import { CustomLogger } from 'src/customLogger';
 
 @Module({
-  imports:[
+  imports: [
     // Setting up JWT
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-    // injecting the config seting
-    imports: [ConfigModule],
-    inject: [ConfigService],
-    useFactory: (config: ConfigService) => {
-      return {
-        // Do not use process.env here, it will read undefined.
-        secret: config.get<string>('jwt_secret'),
-        signOptions: {
-          expiresIn: config.get<string>('jwt_expires'),
-        },
-      };
-    }
-  }), 
+      // injecting the config seting
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          secret: config.get<string>('JWT_SECRET'),
+          signOptions: {
+            expiresIn: config.get<string>('JWT_EXPIRES'),
+          },
+        };
+      }
+    }),
     forwardRef(() => UsersModule),
     forwardRef(() => RolesModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService,JwtStrategy],
+  providers: [CustomLogger, AuthService, PrismaService, JwtStrategy],
   exports: [AuthService, JwtStrategy, PrismaService, PassportModule]
 })
 
-export class AuthModule {}
+export class AuthModule { }

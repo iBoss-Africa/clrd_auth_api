@@ -1,57 +1,47 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { companyCategory } from "@prisma/client";
-import { Transform } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsString, Length } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
 
 
 
 export class UpdateCompanyDto {
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly cacUrl: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly cacNo: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly country: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly state: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly city: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly streetAddress: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     readonly postalCode: string;
 
     @ApiProperty()
-    @IsNotEmpty()
-    @IsEnum(companyCategory, {
-        // message: 'Company Category must be one of these values: ' + Object.values(companyCategory).join(', '),
-    })
-    readonly category: companyCategory; 
-
-    @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    readonly admin_id: any
-
+    readonly category: string;
 }

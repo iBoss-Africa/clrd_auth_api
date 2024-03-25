@@ -1,6 +1,7 @@
-import { Body, Controller,Post,} from '@nestjs/common';
+import { Body, Controller,InternalServerErrorException,Post,} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { CustomLogger } from 'src/customLogger';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +15,8 @@ export class AuthController {
         @Body()
         loginDto: LoginDto
     ): Promise<{ token:string}> {
-        return  this.authService.login(loginDto);
+            return  this.authService.login(loginDto);
+        
     }
 
 }

@@ -1,15 +1,13 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { RoleDto } from './dto/role.dto';
 import { PrismaService } from 'src/prisma.service';
 import { UsersService } from 'src/users/users.service';
-import { PermissionsService } from 'src/permissions/permissions.service';
 
 @Injectable()
 export class RolesService {
     constructor(
         private prisma: PrismaService,
-        private userService: UsersService,
-        private permissionService: PermissionsService
+        private userService: UsersService
     ) { }
 
     async create(roleDto: RoleDto) {
@@ -22,6 +20,12 @@ export class RolesService {
 
     async findOne(id: number) {
         return this.prisma.role.findUnique({ where: { id } });
+    }
+
+    async view(criteria: any) {
+        const role = this.prisma.role.findUnique({ where: criteria });
+        if (!role) throw new NotFoundException('Role not found');
+        return role;
     }
 
     async update(id: number, role: RoleDto) {
