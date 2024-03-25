@@ -49,7 +49,6 @@ export class CompanyController {
         const resp = await this.client.send({ cmd: 'create-company' }, companySignUpDto);
         const { companyData } = await lastValueFrom(resp);
         const token = await this.signupCompany(companyData, companySignUpDto);
-        this.logger.verbose(`${companySignUpDto.companyName} is creating an account`)
         return { id: companyData.id, token }
 
     }

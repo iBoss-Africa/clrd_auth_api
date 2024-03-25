@@ -23,6 +23,8 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "roleId" INTEGER,
     "companyId" INTEGER,
+    "token" INTEGER,
+    "expiresIn" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
